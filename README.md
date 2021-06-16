@@ -6,7 +6,7 @@ Selenium tests for lyric-spot.herokuapp.com
 
 Run the below from the root directory:
 
-    python -m pip install -r requirements.txt
+    $ python -m pip install -r requirements.txt
 
 ## Running the tests
 
