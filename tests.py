@@ -9,9 +9,6 @@ from page import (
     MainPage)
 
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 HOME_URL = 'https://lyric-spot.herokuapp.com/'
 
@@ -45,7 +42,7 @@ class LyricspotTestCase(unittest.TestCase):
         self.driver.get(HOME_URL)
         self.login_page.click_login_button()
         self.spotify_login.logging_in()
-        self.assertEquals('Show Lyrics', self.main_page.get_lyrics_button_text())
+        self.assertEquals('Show Lyrics', self.main_page.get_lyrics_button().text)
 
     def test_check_lyrics(self):
         """Test for checking if the correct song lyrics are shown."""
@@ -53,17 +50,13 @@ class LyricspotTestCase(unittest.TestCase):
 
         self.login_page.click_login_button()
         self.main_page.click_show_lyrics()
-
-        # wait for the lyrics to load
-        WebDriverWait(self.driver, 10).until_not(
-                EC.text_to_be_present_in_element((By.ID, "lyrics"), "Fetching lyrics...")
-            )
+        self.main_page.wait_for_lyrics()
 
         expected_name = 'Swimming Pools (Drank)'
         expected_text = 'Pool full of liquor, then you dive in it'
 
-        self.assertEqual(expected_name, self.main_page.get_song_name_text())
-        self.assertTrue(expected_text in self.main_page.get_lyrics_context())
+        self.assertEqual(expected_name, self.main_page.get_song_name().text)
+        self.assertTrue(expected_text in self.main_page.get_lyrics_content().text)
 
 
 if __name__ == '__main__':

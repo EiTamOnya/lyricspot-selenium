@@ -10,6 +10,7 @@ class SpotifyLoginPageLocators(object):
 
 
 class SpotifyPlayerLocators(object):
+    """Class for the Spotify player page used in the tests."""
     LOGIN_BUTTON = (By.CSS_SELECTOR, '[data-testid="login-button"]')
     ACCEPT_COOCKIES = (By.ID, 'onetrust-accept-btn-handler')
     PLAY_BUTTON = (By.CSS_SELECTOR, '[data-testid="action-bar-row"] [data-testid="play-button"]')
