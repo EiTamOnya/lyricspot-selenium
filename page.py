@@ -2,6 +2,8 @@
 import os
 import time
 
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from locators import (
     SpotifyLoginPageLocators,
@@ -18,6 +20,11 @@ class Page(object):
 
     def __init__(self, driver):
         self.driver = driver
+
+    def wait_for_element_text(self, element, text):
+        WebDriverWait(self.driver, 10).until_not(
+                EC.text_to_be_present_in_element(element, text)
+            )
 
 
 class SpotifyLoginPage(Page):
@@ -66,11 +73,14 @@ class MainPage(Page):
     def click_next_button(self):
         self.driver.find_element(*MainPageLocators.NEXT_BUTTON).click()
 
-    def get_lyrics_button_text(self):
-        return self.driver.find_element(*MainPageLocators.LYRICS_BUTTON).text
+    def get_lyrics_button(self):
+        return self.driver.find_element(*MainPageLocators.LYRICS_BUTTON)
 
-    def get_lyrics_context(self):
-        return self.driver.find_element(*MainPageLocators.LYRICS_TEXT).text
+    def get_lyrics_content(self):
+        return self.driver.find_element(*MainPageLocators.LYRICS_TEXT)
 
-    def get_song_name_text(self):
-        return self.driver.find_element(*MainPageLocators.SONG_NAME).text
+    def get_song_name(self):
+        return self.driver.find_element(*MainPageLocators.SONG_NAME)
+
+    def wait_for_lyrics(self):
+        self.wait_for_element_text(MainPageLocators.LYRICS_TEXT, 'Fetching lyrics...')
