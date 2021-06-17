@@ -27,3 +27,4 @@ class MainPageLocators(object):
     LYRICS_TEXT = (By.ID, 'lyrics')
     TIMER = (By.CLASS_NAME, 'time')
     SONG_NAME = (By.CLASS_NAME, 'song-name')
+    LOGOUT = (By.CSS_SELECTOR, '[href="/logout"]')

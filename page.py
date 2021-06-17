@@ -11,6 +11,8 @@ from locators import (
     LoginPageLocators,
     MainPageLocators,)
 
+
+HOME_URL = 'https://lyric-spot.herokuapp.com/'
 username = os.getenv('USER')
 password = os.getenv('PASS')
 
@@ -29,7 +31,7 @@ class Page(object):
 
 class SpotifyLoginPage(Page):
     """Spotify login page methods."""
-    def logging_in(self):
+    def spotify_log_in(self):
         self.driver.find_element(*SpotifyLoginPageLocators.USERNAME).send_keys(username)
         self.driver.find_element(*SpotifyLoginPageLocators.PASSWORD).send_keys(password)
         self.driver.find_element(*SpotifyLoginPageLocators.LOGIN_BUTTON).click()
@@ -53,16 +55,24 @@ class SpotifyPlayerPage(SpotifyLoginPage):
     def login_and_play_song(self, url):
         self.driver.get(url)
         self.click_login_button()
-        self.logging_in()
+        self.spotify_log_in()
         self.hide_warning_and_play()
         time.sleep(1.5)
         self.switch_to_new_tab()
 
 
-class LoginPage(Page):
+class LoginPage(SpotifyLoginPage):
     """Login page methods."""
+    def get_login_button(self):
+        return self.driver.find_element(*LoginPageLocators.LOGIN_BUTTON)
+
     def click_login_button(self):
         self.driver.find_element(*LoginPageLocators.LOGIN_BUTTON).click()
+
+    def log_in(self):
+        self.driver.get(HOME_URL)
+        self.click_login_button()
+        self.spotify_log_in()
 
 
 class MainPage(Page):
@@ -81,6 +91,9 @@ class MainPage(Page):
 
     def get_song_name(self):
         return self.driver.find_element(*MainPageLocators.SONG_NAME)
+
+    def get_logout_link(self):
+        return self.driver.find_element(*MainPageLocators.LOGOUT)
 
     def wait_for_lyrics(self):
         self.wait_for_element_text(MainPageLocators.LYRICS_TEXT, 'Fetching lyrics...')

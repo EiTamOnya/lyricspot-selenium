@@ -6,11 +6,10 @@ from page import (
     LoginPage,
     SpotifyLoginPage,
     SpotifyPlayerPage,
-    MainPage)
+    MainPage,
+    HOME_URL)
 
 from selenium import webdriver
-
-HOME_URL = 'https://lyric-spot.herokuapp.com/'
 
 
 class LyricspotTestCase(unittest.TestCase):
@@ -23,7 +22,9 @@ class LyricspotTestCase(unittest.TestCase):
         assert(resp.status_code == 200)
 
     def setUp(self):
-        self.driver = webdriver.Chrome(r'driver\\chromedriver.exe')
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--mute-audio")
+        self.driver = webdriver.Chrome(r'driver\\chromedriver.exe', chrome_options=chrome_options)
         self.driver.implicitly_wait(20)
         self.driver.maximize_window()
         self.login_page = LoginPage(self.driver)
@@ -37,12 +38,18 @@ class LyricspotTestCase(unittest.TestCase):
         self.driver.get(HOME_URL)
         self.assertIn('Lyricspot', self.driver.title)
 
-    def test_logging_in(self):
+    def test_logging_in_and_out(self):
         """Test the logging in functionality."""
-        self.driver.get(HOME_URL)
-        self.login_page.click_login_button()
-        self.spotify_login.logging_in()
+        self.login_page.log_in()
+        self.assertEquals('Log out', self.main_page.get_logout_link().text)
+        self.main_page.get_logout_link().click()
+        self.assertEquals('Login with Spotify', self.login_page.get_login_button().text)
+
+    def test_lyrics_button(self):
+        self.login_page.log_in()
         self.assertEquals('Show Lyrics', self.main_page.get_lyrics_button().text)
+        self.main_page.click_show_lyrics()
+        self.assertEquals('Hide Lyrics', self.main_page.get_lyrics_button().text)
 
     def test_check_lyrics(self):
         """Test for checking if the correct song lyrics are shown."""
@@ -57,7 +64,7 @@ class LyricspotTestCase(unittest.TestCase):
 
         self.assertEqual(expected_name, self.main_page.get_song_name().text)
         self.assertTrue(expected_text in self.main_page.get_lyrics_content().text)
-
+    
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
