@@ -9,12 +9,13 @@ from locators import (
     SpotifyLoginPageLocators,
     SpotifyPlayerLocators,
     LoginPageLocators,
-    MainPageLocators,)
+    MainPageLocators,
+)
 
 
-HOME_URL = 'https://lyric-spot.herokuapp.com/'
-username = os.getenv('USER')
-password = os.getenv('PASS')
+HOME_URL = "https://lyric-spot.herokuapp.com/"
+username = os.getenv("USER")
+password = os.getenv("PASS")
 
 
 class Page(object):
@@ -25,12 +26,13 @@ class Page(object):
 
     def wait_for_element_text(self, element, text):
         WebDriverWait(self.driver, 10).until_not(
-                EC.text_to_be_present_in_element(element, text)
-            )
+            EC.text_to_be_present_in_element(element, text)
+        )
 
 
 class SpotifyLoginPage(Page):
     """Spotify login page methods."""
+
     def spotify_log_in(self):
         self.driver.find_element(*SpotifyLoginPageLocators.USERNAME).send_keys(username)
         self.driver.find_element(*SpotifyLoginPageLocators.PASSWORD).send_keys(password)
@@ -39,6 +41,7 @@ class SpotifyLoginPage(Page):
 
 class SpotifyPlayerPage(SpotifyLoginPage):
     """Spotify player page methods."""
+
     def click_login_button(self):
         self.driver.find_element(*SpotifyPlayerLocators.LOGIN_BUTTON).click()
 
@@ -48,7 +51,9 @@ class SpotifyPlayerPage(SpotifyLoginPage):
         self.driver.find_element(*SpotifyPlayerLocators.PLAY_BUTTON).click()
 
     def switch_to_new_tab(self):
-        self.driver.execute_script("window.open('https://lyric-spot.herokuapp.com/','_blank')")
+        self.driver.execute_script(
+            "window.open('https://lyric-spot.herokuapp.com/','_blank')"
+        )
         tabs = self.driver.window_handles
         self.driver.switch_to.window(tabs[1])
 
@@ -63,6 +68,7 @@ class SpotifyPlayerPage(SpotifyLoginPage):
 
 class LoginPage(SpotifyLoginPage):
     """Login page methods."""
+
     def get_login_button(self):
         return self.driver.find_element(*LoginPageLocators.LOGIN_BUTTON)
 
@@ -77,6 +83,7 @@ class LoginPage(SpotifyLoginPage):
 
 class MainPage(Page):
     """Main page methods."""
+
     def click_show_lyrics(self):
         self.driver.find_element(*MainPageLocators.LYRICS_BUTTON).click()
 
@@ -96,4 +103,19 @@ class MainPage(Page):
         return self.driver.find_element(*MainPageLocators.LOGOUT)
 
     def wait_for_lyrics(self):
-        self.wait_for_element_text(MainPageLocators.LYRICS_TEXT, 'Fetching lyrics...')
+        self.wait_for_element_text(MainPageLocators.LYRICS_TEXT, "Fetching lyrics...")
+
+    def get_top_tracks(self):
+        return self.driver.find_element(*MainPageLocators.TOP)
+
+    def get_recent_tracks(self):
+        return self.driver.find_element(*MainPageLocators.RECENT)
+
+    def get_page_title(self):
+        return self.driver.find_element(*MainPageLocators.TITLE)
+
+    def get_all_song_names(self):
+        return self.driver.find_elements(*MainPageLocators.SONG_NAME)
+
+    def get_all_song_artists(self):
+        return self.driver.find_elements(*MainPageLocators.ARTIST_NAME)
