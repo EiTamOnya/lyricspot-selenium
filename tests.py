@@ -8,7 +8,7 @@ from sys import platform
 from page import LoginPage, SpotifyLoginPage, SpotifyPlayerPage, MainPage, HOME_URL
 
 from selenium import webdriver
-#from selenium.webdriver.firefox.options import Option
+
 
 class LyricspotTestCase(unittest.TestCase):
     """E2E test cases for the lyricspot app."""
@@ -24,9 +24,9 @@ class LyricspotTestCase(unittest.TestCase):
         options.add_argument("--mute-audio")
         if platform == "linux" or platform == "linux2":
             options.add_argument("--headless")
-            options.add_argument('--no-sandbox')
-            options.add_argument('--disable-dev-shm-usage')
-            options.add_argument('--disable-gpu')
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
             self.driver = webdriver.Chrome(r"driver/chromedriver", options=options)
         elif platform == "win32":
             self.driver = webdriver.Chrome(r"driver\\chromedriver.exe", options=options)
