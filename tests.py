@@ -1,7 +1,6 @@
 """E2E test cases for the lyricspot app."""
 import requests
 import unittest
-import time
 
 from sys import platform
 
