@@ -56,7 +56,10 @@ class LyricspotTestCase(unittest.TestCase):
         self.main_page.click_show_lyrics()
         self.assertEquals("Hide Lyrics", self.main_page.get_lyrics_button().text)
 
-    @unittest.skip("This doesn't work in headless and is covered by the e2e tests.")
+    @unittest.skipIf(
+        platform != "win32",
+        "This doesn't work in headless and is covered by the e2e tests.",
+    )
     def test_check_lyrics(self):
         """Test for checking if the correct song lyrics are shown."""
 
