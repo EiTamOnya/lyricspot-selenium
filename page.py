@@ -13,8 +13,7 @@ from locators import (
 )
 
 
-# HOME_URL = "https://lyric-spot.herokuapp.com/"
-HOME_URL = "http://127.0.0.1:5000"
+HOME_URL = "https://lyric-spot-staging.herokuapp.com/"
 username = os.getenv("USER")
 password = os.getenv("PASS")
 
