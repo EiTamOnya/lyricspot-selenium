@@ -29,6 +29,9 @@ class Page(object):
             EC.text_to_be_present_in_element(element, text)
         )
 
+    def driver_wait(self, seconds):
+        WebDriverWait(self.driver, seconds)
+
 
 class SpotifyLoginPage(Page):
     """Spotify login page methods."""
@@ -52,7 +55,7 @@ class SpotifyPlayerPage(SpotifyLoginPage):
 
     def switch_to_new_tab(self):
         self.driver.execute_script(
-            "window.open('https://lyric-spot.herokuapp.com/','_blank')"
+            "window.open('https://lyric-spot-staging.herokuapp.com/','_blank')"
         )
         tabs = self.driver.window_handles
         self.driver.switch_to.window(tabs[1])
@@ -119,3 +122,6 @@ class MainPage(Page):
 
     def get_all_song_artists(self):
         return self.driver.find_elements(*MainPageLocators.ARTIST_NAME)
+
+    def get_mode_link(self):
+        return self.driver.find_element(*MainPageLocators.MODE)

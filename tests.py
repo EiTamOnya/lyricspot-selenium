@@ -22,6 +22,7 @@ class LyricspotTestCase(unittest.TestCase):
         options = webdriver.ChromeOptions()
         options.add_argument("--mute-audio")
         if platform == "linux" or platform == "linux2":
+            options.add_argument("--window-size=1920,1080")
             options.add_argument("--headless")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
@@ -45,29 +46,25 @@ class LyricspotTestCase(unittest.TestCase):
     def test_logging_in_and_out(self):
         """Test the logging in functionality."""
         self.login_page.log_in()
-        self.assertEquals("Log out", self.main_page.get_logout_link().text)
+        self.assertEqual("Log out", self.main_page.get_logout_link().text)
         self.main_page.get_logout_link().click()
-        self.assertEquals("Login with Spotify", self.login_page.get_login_button().text)
+        self.assertEqual("Login with Spotify", self.login_page.get_login_button().text)
 
     def test_lyrics_button(self):
         self.login_page.log_in()
-        self.assertEquals("Show Lyrics", self.main_page.get_lyrics_button().text)
+        self.assertEqual("Show Lyrics", self.main_page.get_lyrics_button().text)
         self.main_page.click_show_lyrics()
-        self.assertEquals("Hide Lyrics", self.main_page.get_lyrics_button().text)
+        self.assertEqual("Hide Lyrics", self.main_page.get_lyrics_button().text)
 
-    @unittest.skipIf(
-        platform != "win32",
-        "This doesn't work in headless and is covered by the e2e tests.",
-    )
     def test_check_lyrics(self):
         """Test for checking if the correct song lyrics are shown."""
-
-        # SHOULD ADD AN ENDPOINT THAT DOES THAT FOR ME
-        self.spotify_player.login_and_play_song(
-            "https://open.spotify.com/album/2kKXGWaCEl06EKZ4DxBJIT"
-        )
-
-        self.login_page.click_login_button()
+        self.login_page.log_in()
+        self.main_page.get_top_tracks().click()
+        songs = self.driver.get_all_song_names()
+        songs[0].click()
+        self.driver.implicitly_wait(3)
+        self.spotify_player.switch_to_new_tab()
+        self.driver.implicitly_wait(3)
         self.main_page.click_show_lyrics()
         self.main_page.wait_for_lyrics()
 
@@ -88,7 +85,7 @@ class LyricspotTestCase(unittest.TestCase):
         self.assertTrue("Deafheaven" in artists)
 
     def test_check_recent_tracks(self):
-        """Test for checking if the top tracks are shown."""
+        """Test for checking if the recent tracks are shown."""
         self.login_page.log_in()
         self.main_page.get_recent_tracks().click()
         self.assertTrue(
@@ -96,6 +93,27 @@ class LyricspotTestCase(unittest.TestCase):
         )
         song_names = [song.text for song in self.main_page.get_all_song_names()]
         self.assertTrue("Dream House" in song_names)
+
+    def test_check_button_color(self):
+        light = "rgba(225, 239, 225, 1)"
+        dark = "rgba(14, 22, 37, 1)"
+        self.login_page.log_in()
+        self.assertEqual(
+            self.main_page.get_lyrics_button().value_of_css_property("color"),
+            light,
+        )
+        self.main_page.get_mode_link().click()
+        self.assertEqual(
+            self.main_page.get_lyrics_button().value_of_css_property("color"),
+            dark,
+        )
+        # Make sure the change is saved in the cookie
+        self.driver.implicitly_wait(1.5)
+        self.main_page.get_recent_tracks().click()
+        self.assertEqual(
+            self.main_page.get_recent_tracks().value_of_css_property("color"),
+            dark,
+        )
 
 
 if __name__ == "__main__":
