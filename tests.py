@@ -56,15 +56,17 @@ class LyricspotTestCase(unittest.TestCase):
         self.main_page.click_show_lyrics()
         self.assertEqual("Hide Lyrics", self.main_page.get_lyrics_button().text)
 
+    @unittest.skipIf(
+        platform != "win32",
+        "This doesn't work in headless and is covered by the e2e tests.",
+    )
     def test_check_lyrics(self):
         """Test for checking if the correct song lyrics are shown."""
-        self.login_page.log_in()
-        self.main_page.get_top_tracks().click()
-        songs = self.driver.get_all_song_names()
-        songs[0].click()
-        self.driver.implicitly_wait(3)
-        self.spotify_player.switch_to_new_tab()
-        self.driver.implicitly_wait(3)
+        self.spotify_player.login_and_play_song(
+            "https://open.spotify.com/album/2kKXGWaCEl06EKZ4DxBJIT"
+        )
+
+        self.login_page.click_login_button()
         self.main_page.click_show_lyrics()
         self.main_page.wait_for_lyrics()
 
@@ -94,7 +96,7 @@ class LyricspotTestCase(unittest.TestCase):
         song_names = [song.text for song in self.main_page.get_all_song_names()]
         self.assertTrue("Dream House" in song_names)
 
-    def test_check_button_color(self):
+    def test_dark_mode(self):
         light = "rgba(225, 239, 225, 1)"
         dark = "rgba(14, 22, 37, 1)"
         self.login_page.log_in()
