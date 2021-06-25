@@ -1,7 +1,8 @@
 """E2E test cases for the lyricspot app."""
+import pickle
 import requests
 import unittest
-
+import time
 from sys import platform
 
 from page import LoginPage, SpotifyLoginPage, SpotifyPlayerPage, MainPage, HOME_URL
@@ -36,7 +37,21 @@ class LyricspotTestCase(unittest.TestCase):
         self.spotify_login = SpotifyLoginPage(self.driver)
         self.spotify_player = SpotifyPlayerPage(self.driver)
         self.main_page = MainPage(self.driver)
+        # Add the cookie before each test
+        self.driver.get(HOME_URL)
+        self.login_page.click_login_button()
+        with open("cookie.txt", "rb") as cookiesfile:
+            cookies = pickle.load(cookiesfile)
+            for cookie in cookies:
+                self.driver.add_cookie(cookie)
         self.addCleanup(self.driver.quit)
+
+    @unittest.skip("This is not needed for now")
+    def test_get_cookie(self):
+        self.login_page.log_in()
+        time.sleep(5)
+        with open("cookie.txt", "wb") as filehandler:
+            pickle.dump(self.driver.get_cookies(), filehandler)
 
     def test_page_title(self):
         """Test the title of the webpage."""
@@ -45,21 +60,20 @@ class LyricspotTestCase(unittest.TestCase):
 
     def test_logging_in_and_out(self):
         """Test the logging in functionality."""
-        self.login_page.log_in()
+        self.driver.get(HOME_URL)
+        self.login_page.click_login_button()
         self.assertEqual("Log out", self.main_page.get_logout_link().text)
         self.main_page.get_logout_link().click()
         self.assertEqual("Login with Spotify", self.login_page.get_login_button().text)
 
     def test_lyrics_button(self):
-        self.login_page.log_in()
+        self.driver.get(HOME_URL)
+        self.login_page.click_login_button()
         self.assertEqual("Show Lyrics", self.main_page.get_lyrics_button().text)
         self.main_page.click_show_lyrics()
         self.assertEqual("Hide Lyrics", self.main_page.get_lyrics_button().text)
 
-    @unittest.skipIf(
-        platform != "win32",
-        "This doesn't work in headless and is covered by the e2e tests.",
-    )
+    @unittest.skip("This doesn't work in headless and is covered by the e2e tests.")
     def test_check_lyrics(self):
         """Test for checking if the correct song lyrics are shown."""
         self.spotify_player.login_and_play_song(
@@ -78,7 +92,8 @@ class LyricspotTestCase(unittest.TestCase):
 
     def test_check_top_tracks(self):
         """Test for checking if the top tracks are shown."""
-        self.login_page.log_in()
+        self.driver.get(HOME_URL)
+        self.login_page.click_login_button()
         self.main_page.get_top_tracks().click()
         self.assertTrue(
             "Your 50 Top Played Tracks" in self.main_page.get_page_title().text
@@ -88,7 +103,8 @@ class LyricspotTestCase(unittest.TestCase):
 
     def test_check_recent_tracks(self):
         """Test for checking if the recent tracks are shown."""
-        self.login_page.log_in()
+        self.driver.get(HOME_URL)
+        self.login_page.click_login_button()
         self.main_page.get_recent_tracks().click()
         self.assertTrue(
             "Your 50 Recently Played Tracks" in self.main_page.get_page_title().text
@@ -99,7 +115,8 @@ class LyricspotTestCase(unittest.TestCase):
     def test_dark_mode(self):
         light = "rgba(225, 239, 225, 1)"
         dark = "rgba(14, 22, 37, 1)"
-        self.login_page.log_in()
+        self.driver.get(HOME_URL)
+        self.login_page.click_login_button()
         self.assertEqual(
             self.main_page.get_lyrics_button().value_of_css_property("color"),
             light,
@@ -110,7 +127,7 @@ class LyricspotTestCase(unittest.TestCase):
             dark,
         )
         # Make sure the change is saved in the cookie
-        self.driver.implicitly_wait(1.5)
+        time.sleep(2)
         self.main_page.get_recent_tracks().click()
         self.assertEqual(
             self.main_page.get_recent_tracks().value_of_css_property("color"),
