@@ -29,5 +29,7 @@ jobs:
       env:
           PASS: ${{ secrets.PASS }}
           USER: ${{ secrets.USER }}
+          COOKIE_PASS: ${{ secrets.COOKIE_PASS }}
       run: |
+        unzip -P $COOKIE_PASS cookie.zip
         python -m unittest discover -v
